@@ -13,28 +13,42 @@ function App() {
 
   //   [
   //     {
-  //         "x": 223,
-  //         "y": 207
+  //         "x": 100,
+  //         "y": 100
   //     },
   //     {
-  //         "x": 677,
-  //         "y": 207
+  //         "x": 200,
+  //         "y": 400
   //     },
   //     {
-  //         "x": 677,
-  //         "y": 774
+  //         "x": 400,
+  //         "y": 400
   //     },
   //     {
-  //         "x": 223,
-  //         "y": 774
-  //     },
+  //         "x": 500,
+  //         "y": 100
+  //     }
+  //     ,
   //     {
-  //         "x": 223,
-  //         "y": 207
+  //         "x": 100,
+  //         "y": 100
   //     }
   // ]
     )
 
+const calcArea = () => {
+  let sum = 0;
+  
+  for (let i = 0; i < linesHistory.length - 1; i++) {
+    sum += (linesHistory[i].x * linesHistory[i+1].y) - (linesHistory[i+1].x * linesHistory[i].y);
+  }
+
+  const area = Math.abs(sum) / 2;
+  console.log(area);
+  return area
+};
+
+calcArea();
 
   const drawLinesHistory = () =>{
     const canvas = canvasRef.current;
@@ -207,28 +221,7 @@ function App() {
     // setLineStartPosition(newPos)
   }
 
-  // addEventListener("mousedown", (event) => {
-  //   linesHistory.map((line, i) => {
-  //       const x1 = line.x;
-  //       const y1 = line.y;
-  //       const x2 = linesHistory[i + 1].x;
-  //       const y2 = linesHistory[i + 1].y;
-    
 
-  //         const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
-  //         const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
-          
-  //         let cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
-
-  //         // console.log(cursorDistance)
-
-  //         if(cursorDistance<10){
-  //           console.log('doszło do sigmy',cursorDistance, i)
-
-  //         }
-  //     })
-    
-  //   });
 
   onmousedown = (event) => {
     linesHistory.forEach((line, i) => {
@@ -266,10 +259,10 @@ function App() {
                     // linesHistory[i + 1].x = event.screenX;
 
 
-
+                  console.log('dlugosc', linesHistory.length, linesHistory)
 
                     // odejmuje 110 zeby cursor matchował
-                    if(i==0){
+                    if(i===0){
 
                       if(isHorizontalLine(linesHistory[i + 1], linesHistory[i])){
                         linesHistory[i + 1].y = event.screenY - 110;
@@ -287,6 +280,38 @@ function App() {
                         linesHistory[(linesHistory.length)-1].x = event.screenX ;
                       }
    
+                    }
+                    else if(i===linesHistory.length-2){
+                      
+                      console.log('donciu nol pamperam')
+
+
+                      console.log('co to za linia', linesHistory[linesHistory.length-2])
+
+
+
+                      if(isHorizontalLine(linesHistory[i + 1], linesHistory[i])){
+                        linesHistory[0].y = event.screenY - 110;
+                        linesHistory[linesHistory.length-1].y = event.screenY - 110;
+
+  
+                        // linesHistory[i - 1].x = event.screenX;
+                        linesHistory[i].y = event.screenY - 110;
+
+                      }
+                      else{
+                        linesHistory[0].x = event.screenX ;
+                        linesHistory[linesHistory.length-1].x = event.screenX
+  
+                        // linesHistory[i - 1].x = event.screenX;
+                        linesHistory[i].x = event.screenX ;
+                      }
+
+
+
+
+
+
                     }
                     else{
 
@@ -369,7 +394,7 @@ function App() {
 
     <div className='xd'>
 
-{/* <div className="counter">
+<div className="counter">
         {
           linesHistory.map((line, i) => {
             let distance = null; // Zmienna na odległość, inicjalnie ustawiona na null
@@ -379,13 +404,16 @@ function App() {
                 Math.pow(linesHistory[i + 1].x - line.x, 2) +
                 Math.pow(linesHistory[i + 1].y - line.y, 2)
               );
-              console.log("Odległość między punktami", i, "i", i + 1, "wynosi:", distance);
+              // console.log("Odległość między punktami", i, "i", i + 1, "wynosi:", distance);
             }
             
-            return (distance !== 0 ? <span key={i}>Linia nr {i} {Math.floor(distance)} </span> : null)// Zwraca odległość jako element JSX lub null, jeśli odległość jest null
+            return (distance !== 0 ? <span key={i}>Linia nr {i} {Math.floor(distance)}, ({line.x}, {line.y}) </span> : null)// Zwraca odległość jako element JSX lub null, jeśli odległość jest null
           })
         }
-      </div> */}
+
+        <p>Pole całkowite {calcArea()}</p>
+    
+      </div>
     
     <div className="canvas">
 

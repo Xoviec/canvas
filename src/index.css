@@ -78,6 +78,7 @@ button:focus-visible {
 }
 
 .counter{
+  position: absolute;
   display: flex;
   flex-direction: column;
   padding: 1rem;
