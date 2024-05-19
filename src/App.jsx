@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useState } from 'react';
+import { useDoubleClick } from './custom hooks/DoubleClick';
 
 function App() {
   const canvasRef = useRef(null);
@@ -189,36 +190,70 @@ calcArea();
 
   const handleClick = (event) =>{
 
-
-    linesHistory.map((line, i) => {
-      if (i < linesHistory.length - 1) {
-        const x1 = line.x;
-        const y1 = line.y;
-        const x2 = linesHistory[i + 1].x;
-        const y2 = linesHistory[i + 1].y;
+    //to chyba mmozna wywalic
+    // linesHistory.map((line, i) => {
+    //   if (i < linesHistory.length - 1) {
+    //     const x1 = line.x;
+    //     const y1 = line.y;
+    //     const x2 = linesHistory[i + 1].x;
+    //     const y2 = linesHistory[i + 1].y;
     
-          const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
-          const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
+    //       const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
+    //       const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
 
-          const cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
+    //       const cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
 
-          if(cursorDistance<10){
-            console.log('klikneto sciane', i)
+    //       if(cursorDistance<10){
+    //         console.log('klikneto sciane', i)
 
 
-          }
-      }})
+    //       }
+    //   }})
     
       //rysowanie
 
-    // console.log('kliknieto')
-    // const newPos = {
-    //   x: event.clientX,
-    //   y: event.clientY
-    // }
 
-    // editLineHistroy(event.clientX, event.clientY)
-    // setLineStartPosition(newPos)
+    //zamykanie figury
+      // const newPos = {
+      //   x: linesHistory[0].x,
+      //   y: linesHistory[0].y,
+      // }
+  
+      // editLineHistroy(linesHistory[0].x, linesHistory[0].y)
+  
+      // setLineEndPosition(newPos)
+
+
+    const cursorDistanceFromStart = Math.sqrt(Math.pow(lineStartPosition.x - event.clientX, 2) + Math.pow(lineStartPosition.y - event.clientY, 2));
+
+    console.log('dystnas', cursorDistanceFromStart)
+
+
+    if(cursorDistanceFromStart<20){
+      const newPos = {
+        x: linesHistory[0].x,
+        y: linesHistory[0].y,
+      }
+  
+      editLineHistroy(linesHistory[0].x, linesHistory[0].y)
+  
+      setLineEndPosition(newPos)
+    }
+  else{
+    const newPos = {
+      x: event.clientX,
+      y: event.clientY
+    }
+
+
+
+    editLineHistroy(event.clientX, event.clientY)
+    setLineStartPosition(newPos)
+  }
+
+
+    console.log('kliknieto')
+
   }
 
 
@@ -376,6 +411,9 @@ calcArea();
 
   }
 
+
+  const myDoubleClickCallBack = useDoubleClick(handleClick, handleDoubleClick)
+
   const handleMouseMove = (event) => {
 
 
@@ -418,7 +456,7 @@ calcArea();
     <div className="canvas">
 
 
-      <canvas ref={canvasRef} width="1920" height="1080" onMouseMove={handleMouseMove} onClick={handleClick} onDoubleClick={handleDoubleClick}></canvas>
+      <canvas ref={canvasRef} width="1920" height="1080" onMouseMove={handleMouseMove} onClick={handleClick}></canvas>
     </div>
     
     </div>
