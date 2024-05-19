@@ -7,6 +7,7 @@ function App() {
 
   const [lineStartPosition, setLineStartPosition] = useState({x: 300, y: 400})
   const [lineEndPosition, setLineEndPosition] = useState({ x: 300, y: 400 })
+  const [readyPoly, setReadyPoly] = useState(false)
 
   const [linesHistory, setLinesHistory] = useState(
     
@@ -45,7 +46,6 @@ const calcArea = () => {
   }
 
   const area = Math.abs(sum) / 2;
-  console.log(area);
   return area
 };
 
@@ -57,57 +57,140 @@ calcArea();
     ctx.globalCompositeOperation='source-over';
 
 
-    // console.log(lineEndPosition.x, lineEndPosition.y)
-
-    linesHistory.forEach((line, i) => {
-      if (i < linesHistory.length - 1) {
-        const x1 = line.x;
-        const y1 = line.y;
-        const x2 = linesHistory[i + 1].x;
-        const y2 = linesHistory[i + 1].y;
-    
+    if(!readyPoly){
+      ctx.beginPath()
+      ctx.arc(linesHistory[0].x, linesHistory[0].y, 20, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
+      ctx.fillStyle = 'green';
+      ctx.fill();
+      ctx.closePath()
+    }
 
 
 
+    if(readyPoly){
 
+      ctx.beginPath();
+      ctx.moveTo(linesHistory[0].x, linesHistory[0].y);
 
-        const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        
-        if (distance > 0) { // Sprawdzenie, czy odległość jest większa od zera
-          const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
-          const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
-
-
-          const cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
-
-          ctx.beginPath();
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
+      linesHistory.forEach((line, i) => {
+        if (i < linesHistory.length - 1) {
+          const x1 = line.x;
+          const y1 = line.y;
+          const x2 = linesHistory[i + 1].x;
+          const y2 = linesHistory[i + 1].y;
+          const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
           
-          ctx.strokeStyle = 'red';
-          ctx.lineWidth = 5;
-          ctx.stroke();
-    
-          ctx.beginPath();
-          ctx.arc(xMid, yMid, 10, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
-
-
-          if(cursorDistance<10){
-            ctx.fillStyle = 'green';
+          
+          if (distance > 0) { // Sprawdzenie, czy odległość jest większa od zera
+     
+            ctx.lineTo(x2, y2);
+            
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+  
           }
-          else{
-            ctx.fillStyle = 'blue';
-
-          }
-          // ctx.fillStyle = 'blue'; // Kolor kółka
-          ctx.fill();
-    
-          ctx.fillStyle = 'white';
-          ctx.font = '12px Arial';
-          ctx.fillText(i, xMid - 4, yMid + 4); // Wyświetlanie numeru indeksu w kółku
         }
-      }
-    });
+      });
+
+      ctx.fillStyle = 'rgba(42, 17, 145, 0.2)'
+      ctx.fill()
+      ctx.closePath()
+
+
+
+      linesHistory.forEach((line, i) => {
+        if (i < linesHistory.length - 1) {
+          const x1 = line.x;
+          const y1 = line.y;
+          const x2 = linesHistory[i + 1].x;
+          const y2 = linesHistory[i + 1].y;
+          const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+          
+          
+          if (distance > 0) { // Sprawdzenie, czy odległość jest większa od zera
+            const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
+            const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
+  
+  
+            const cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
+            ctx.beginPath();
+            ctx.arc(xMid, yMid, 10, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
+  
+            if(cursorDistance<10){
+              ctx.fillStyle = 'rgba(109, 109, 109, 1)';
+            }
+            else{
+              ctx.fillStyle = 'rgba(67, 67, 67, 1)';
+  
+            }
+            // ctx.fillStyle = 'blue'; // Kolor kółka
+            ctx.fill();
+      
+            ctx.fillStyle = 'white';
+            ctx.font = '12px Arial';
+            ctx.fillText(i, xMid - 4, yMid + 4); // Wyświetlanie numeru indeksu w kółku
+            ctx.closePath()
+          }
+        }
+      });
+
+
+
+    }
+    else{
+      linesHistory.forEach((line, i) => {
+        if (i < linesHistory.length - 1) {
+          const x1 = line.x;
+          const y1 = line.y;
+          const x2 = linesHistory[i + 1].x;
+          const y2 = linesHistory[i + 1].y;
+          const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+          
+          
+          if (distance > 0) { // Sprawdzenie, czy odległość jest większa od zera
+            const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
+            const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
+  
+  
+            const cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
+  
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 5;
+            ctx.stroke();
+  
+            ctx.closePath()
+      
+            ctx.beginPath();
+            ctx.arc(xMid, yMid, 10, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
+  
+  
+            if(cursorDistance<10){
+              ctx.fillStyle = 'rgba(109, 109, 109, 1)';
+            }
+            else{
+              ctx.fillStyle = 'rgba(67, 67, 67, 1)';
+  
+            }
+            // ctx.fillStyle = 'blue'; // Kolor kółka
+            ctx.fill();
+      
+            ctx.fillStyle = 'white';
+            ctx.font = '12px Arial';
+            ctx.fillText(i, xMid - 4, yMid + 4); // Wyświetlanie numeru indeksu w kółku
+            ctx.closePath()
+          }
+        }
+      });
+    }
+
+    
+
+   
     
     
   }
@@ -119,13 +202,20 @@ calcArea();
     const ctx = canvas.getContext('2d');
 
     const drawLine = () => {
+
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      ctx.moveTo(lineStartPosition.x, lineStartPosition.y);
-      ctx.lineTo(lineEndPosition.x, lineEndPosition.y);
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 5;
-      ctx.stroke();
+
+      if(!readyPoly){
+        ctx.beginPath();
+        ctx.moveTo(lineStartPosition.x, lineStartPosition.y);
+        ctx.lineTo(lineEndPosition.x, lineEndPosition.y);
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+      }
+      
+
 
       // console.log('usuwam')
       drawLinesHistory()
@@ -156,16 +246,17 @@ calcArea();
 
     drawLinesHistory()
 
-    linesHistory.map((line, i)=>{
+    //to chyba do wywalenia
+    // linesHistory.map((line, i)=>{
 
-      ctx.beginPath();
-      ctx.moveTo(line.x, line.y);
-      ctx.lineTo(linesHistory[i+1]?.x, linesHistory[i+1]?.y);
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 5;
-      ctx.stroke();
-      console.log(line)
-    })
+    //   ctx.beginPath();
+    //   ctx.moveTo(line.x, line.y);
+    //   ctx.lineTo(linesHistory[i+1]?.x, linesHistory[i+1]?.y);
+    //   ctx.strokeStyle = 'red';
+    //   ctx.lineWidth = 5;
+    //   ctx.stroke();
+    //   console.log(line)
+    // })
 
     console.log('rysuje sciezki')
     
@@ -224,33 +315,44 @@ calcArea();
       // setLineEndPosition(newPos)
 
 
-    const cursorDistanceFromStart = Math.sqrt(Math.pow(lineStartPosition.x - event.clientX, 2) + Math.pow(lineStartPosition.y - event.clientY, 2));
 
-    console.log('dystnas', cursorDistanceFromStart)
+    if(!readyPoly)
+    {
+
+      const cursorDistanceFromStart = Math.sqrt(Math.pow(linesHistory[0].x - event.clientX, 2) + Math.pow(linesHistory[0].y - event.clientY, 2));
 
 
-    if(cursorDistanceFromStart<20){
+      console.log('kursor:', event.clientX, '-', event.clientY )
+      console.log('punkt:', lineStartPosition.x, '-', lineStartPosition.y)
+      console.log('dystnas', cursorDistanceFromStart)
+  
+  
+      if(cursorDistanceFromStart<20){
+        const newPos = {
+          x: linesHistory[0].x,
+          y: linesHistory[0].y,
+        }
+    
+        editLineHistroy(linesHistory[0].x, linesHistory[0].y)
+    
+        setLineEndPosition(newPos)
+        setReadyPoly(true)
+      }
+    else{
       const newPos = {
-        x: linesHistory[0].x,
-        y: linesHistory[0].y,
+        x: event.clientX,
+        y: event.clientY
       }
   
-      editLineHistroy(linesHistory[0].x, linesHistory[0].y)
   
-      setLineEndPosition(newPos)
+  
+      editLineHistroy(event.clientX, event.clientY)
+      setLineStartPosition(newPos)
     }
-  else{
-    const newPos = {
-      x: event.clientX,
-      y: event.clientY
+  
+
     }
-
-
-
-    editLineHistroy(event.clientX, event.clientY)
-    setLineStartPosition(newPos)
-  }
-
+   
 
     console.log('kliknieto')
 
