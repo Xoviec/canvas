@@ -8,6 +8,7 @@ function App() {
   const [lineStartPosition, setLineStartPosition] = useState({x: 300, y: 400})
   const [lineEndPosition, setLineEndPosition] = useState({ x: 300, y: 400 })
   const [readyPoly, setReadyPoly] = useState(false)
+  const [isIntersect, setIsIntersect] = useState(false)
 
   const [linesHistory, setLinesHistory] = useState(
     
@@ -38,6 +39,69 @@ function App() {
   // ]
     )
 
+
+
+    function onSegment(p, q, r) {
+      if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) &&
+          q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y)) {
+          return true;
+      }
+      return false;
+  }
+  
+  function orientation(p, q, r) {
+      let val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+      if (val === 0) return 0; // współliniowe
+      return (val > 0) ? 1 : 2; // 1 -> zgodnie z ruchem wskazówek zegara, 2 -> przeciwnie do ruchu wskazówek zegara
+  }
+  
+  function doIntersect(p1, q1, p2, q2) {
+      let o1 = orientation(p1, q1, p2);
+      let o2 = orientation(p1, q1, q2);
+      let o3 = orientation(p2, q2, p1);
+      let o4 = orientation(p2, q2, q1);
+  
+      if (o1 !== o2 && o3 !== o4) return true;
+  
+      if (o1 === 0 && onSegment(p1, p2, q1)) return true;
+      if (o2 === 0 && onSegment(p1, q2, q1)) return true;
+      if (o3 === 0 && onSegment(p2, p1, q2)) return true;
+      if (o4 === 0 && onSegment(p2, q1, q2)) return true;
+  
+      return false;
+  }
+  
+  function isSameEdge(p1, q1, p2, q2) {
+      return (p1.x === p2.x && p1.y === p2.y && q1.x === q2.x && q1.y === q2.y) ||
+             (p1.x === q2.x && p1.y === q2.y && q1.x === p2.x && q1.y === p2.y);
+  }
+  
+  function polygonHasIntersectingEdges(linesHistory) {
+      const n = linesHistory.length;
+      for (let i = 0; i < n - 1; ++i) {
+          for (let j = i + 2; j < n - 1; ++j) {
+              if ((i === 0 && j === n - 2) || Math.abs(i - j) === 1) continue; 
+  
+              let p1 = linesHistory[i];
+              let q1 = linesHistory[i + 1];
+              let p2 = linesHistory[j];
+              let q2 = linesHistory[j + 1];
+  
+              if (isSameEdge(p1, q1, p2, q2)) continue;
+  
+              if (doIntersect(p1, q1, p2, q2)) {
+                  console.log(`Intersection found between edges [${i}, ${i+1}] and [${j}, ${j+1}]`);
+                  setIsIntersect(true)
+                  return true;
+              }
+          }
+      }
+      setIsIntersect(false)
+      return false;
+  }
+  
+  
+
 const calcArea = () => {
   let sum = 0;
   
@@ -49,7 +113,10 @@ const calcArea = () => {
   return area
 };
 
-calcArea();
+// console.log('czy sie przecinają?', polygonHasIntersectingEdges(linesHistory)); // Zwraca false, bo krawędzie się nie przecinają
+
+
+// calcArea();
 
   const drawLinesHistory = () =>{
     const canvas = canvasRef.current;
@@ -58,11 +125,7 @@ calcArea();
 
 
     if(!readyPoly){
-      ctx.beginPath()
-      ctx.arc(linesHistory[0].x, linesHistory[0].y, 20, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
-      ctx.fillStyle = 'green';
-      ctx.fill();
-      ctx.closePath()
+  
     }
 
 
@@ -84,7 +147,6 @@ calcArea();
           if (distance > 0) { // Sprawdzenie, czy odległość jest większa od zera
      
             ctx.lineTo(x2, y2);
-            
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 3;
             ctx.stroke();
@@ -117,14 +179,8 @@ calcArea();
             ctx.beginPath();
             ctx.arc(xMid, yMid, 10, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
   
-            if(cursorDistance<10){
-              ctx.fillStyle = 'rgba(109, 109, 109, 1)';
-            }
-            else{
-              ctx.fillStyle = 'rgba(67, 67, 67, 1)';
-  
-            }
-            // ctx.fillStyle = 'blue'; // Kolor kółka
+            ctx.fillStyle = cursorDistance<10 ? 'rgba(109, 109, 109, 1)' : 'rgba(67, 67, 67, 1)'
+
             ctx.fill();
       
             ctx.fillStyle = 'white';
@@ -139,6 +195,13 @@ calcArea();
 
     }
     else{
+
+      ctx.beginPath()
+      ctx.arc(linesHistory[0].x, linesHistory[0].y, 20, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
+      ctx.fillStyle = 'rgba(229, 191, 79, 0.24)';
+      ctx.fill();
+      ctx.closePath()
+
       linesHistory.forEach((line, i) => {
         if (i < linesHistory.length - 1) {
           const x1 = line.x;
@@ -169,16 +232,10 @@ calcArea();
             ctx.arc(xMid, yMid, 10, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
   
   
-            if(cursorDistance<10){
-              ctx.fillStyle = 'rgba(109, 109, 109, 1)';
-            }
-            else{
-              ctx.fillStyle = 'rgba(67, 67, 67, 1)';
-  
-            }
-            // ctx.fillStyle = 'blue'; // Kolor kółka
+            ctx.fillStyle = cursorDistance<10 ? 'rgba(109, 109, 109, 1)' : 'rgba(67, 67, 67, 1)'
+        
+
             ctx.fill();
-      
             ctx.fillStyle = 'white';
             ctx.font = '12px Arial';
             ctx.fillText(i, xMid - 4, yMid + 4); // Wyświetlanie numeru indeksu w kółku
@@ -189,7 +246,7 @@ calcArea();
     }
 
     
-
+    polygonHasIntersectingEdges(linesHistory)
    
     
     
@@ -246,20 +303,6 @@ calcArea();
 
     drawLinesHistory()
 
-    //to chyba do wywalenia
-    // linesHistory.map((line, i)=>{
-
-    //   ctx.beginPath();
-    //   ctx.moveTo(line.x, line.y);
-    //   ctx.lineTo(linesHistory[i+1]?.x, linesHistory[i+1]?.y);
-    //   ctx.strokeStyle = 'red';
-    //   ctx.lineWidth = 5;
-    //   ctx.stroke();
-    //   console.log(line)
-    // })
-
-    console.log('rysuje sciezki')
-    
 
   },[linesHistory])
 
@@ -281,51 +324,11 @@ calcArea();
 
   const handleClick = (event) =>{
 
-    //to chyba mmozna wywalic
-    // linesHistory.map((line, i) => {
-    //   if (i < linesHistory.length - 1) {
-    //     const x1 = line.x;
-    //     const y1 = line.y;
-    //     const x2 = linesHistory[i + 1].x;
-    //     const y2 = linesHistory[i + 1].y;
-    
-    //       const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
-    //       const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
-
-    //       const cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
-
-    //       if(cursorDistance<10){
-    //         console.log('klikneto sciane', i)
-
-
-    //       }
-    //   }})
-    
-      //rysowanie
-
-
-    //zamykanie figury
-      // const newPos = {
-      //   x: linesHistory[0].x,
-      //   y: linesHistory[0].y,
-      // }
-  
-      // editLineHistroy(linesHistory[0].x, linesHistory[0].y)
-  
-      // setLineEndPosition(newPos)
-
-
-
     if(!readyPoly)
     {
 
       const cursorDistanceFromStart = Math.sqrt(Math.pow(linesHistory[0].x - event.clientX, 2) + Math.pow(linesHistory[0].y - event.clientY, 2));
 
-
-      console.log('kursor:', event.clientX, '-', event.clientY )
-      console.log('punkt:', lineStartPosition.x, '-', lineStartPosition.y)
-      console.log('dystnas', cursorDistanceFromStart)
-  
   
       if(cursorDistanceFromStart<20){
         const newPos = {
@@ -343,8 +346,6 @@ calcArea();
         x: event.clientX,
         y: event.clientY
       }
-  
-  
   
       editLineHistroy(event.clientX, event.clientY)
       setLineStartPosition(newPos)
@@ -383,18 +384,9 @@ calcArea();
 
 
             if (cursorDistance < 10) {
-                console.log('doszło do sigmy', cursorDistance, i);
-
-          console.log('dupsko', isHorizontalLine(linesHistory[i + 1], linesHistory[i]))
-
-
                 onmousemove = (event) => {
                     console.log('ruszam linie', i);
                     console.log(event.screenX, event.screenY);
-
-                    // Aktualizacja punktu końcowego dla sąsiednich linii
-                    // linesHistory[i + 1].x = event.screenX;
-
 
                   console.log('dlugosc', linesHistory.length, linesHistory)
 
@@ -403,92 +395,46 @@ calcArea();
 
                       if(isHorizontalLine(linesHistory[i + 1], linesHistory[i])){
                         linesHistory[i + 1].y = event.screenY - 110;
-
-                        // linesHistory[i - 1].x = event.screenX;
                         linesHistory[i].y = event.screenY - 110;
-  
                         linesHistory[(linesHistory.length)-1].y = event.screenY - 110;
                       }else{
-
                         linesHistory[i + 1].x = event.screenX ;
-
                         linesHistory[i].x = event.screenX ;
-  
                         linesHistory[(linesHistory.length)-1].x = event.screenX ;
                       }
    
                     }
                     else if(i===linesHistory.length-2){
                       
-                      console.log('donciu nol pamperam')
-
-
-                      console.log('co to za linia', linesHistory[linesHistory.length-2])
-
-
-
                       if(isHorizontalLine(linesHistory[i + 1], linesHistory[i])){
                         linesHistory[0].y = event.screenY - 110;
                         linesHistory[linesHistory.length-1].y = event.screenY - 110;
-
-  
-                        // linesHistory[i - 1].x = event.screenX;
                         linesHistory[i].y = event.screenY - 110;
-
                       }
                       else{
                         linesHistory[0].x = event.screenX ;
                         linesHistory[linesHistory.length-1].x = event.screenX
-  
-                        // linesHistory[i - 1].x = event.screenX;
                         linesHistory[i].x = event.screenX ;
                       }
-
-
-
-
-
 
                     }
                     else{
 
                       if(isHorizontalLine(linesHistory[i + 1], linesHistory[i])){
                         linesHistory[i + 1].y = event.screenY - 110;
-  
-                        // linesHistory[i - 1].x = event.screenX;
                         linesHistory[i].y = event.screenY - 110;
-
                       }
                       else{
                         linesHistory[i + 1].x = event.screenX ;
-  
-                        // linesHistory[i - 1].x = event.screenX;
                         linesHistory[i].x = event.screenX ;
                       }
-                      
                
                     }
 
-
-
-                    // Tutaj możesz dodać więcej logiki związanej z aktualizacją sąsiednich linii
-
-                    // Przerysuj canvas lub wykonaj inne operacje po aktualizacji
-                    // redrawCanvas();
                 };
 
                 onmouseup = (event) => {
-                    // Usuń zdarzenie mousemove
                     onmousemove = null;
-
-                    // Zaktualizuj punkt końcowy dla sąsiednich linii
-                    // linesHistory[i].x = event.screenX;
-                    // linesHistory[i].y = event.screenY;
-
-                    // Tutaj możesz dodać więcej logiki związanej z aktualizacją sąsiednich linii
-
-                    // Przerysuj canvas lub wykonaj inne operacje po aktualizacji
-                    // redrawCanvas();
                 };
             }
         }
@@ -514,7 +460,6 @@ calcArea();
   }
 
 
-  const myDoubleClickCallBack = useDoubleClick(handleClick, handleDoubleClick)
 
   const handleMouseMove = (event) => {
 
@@ -524,9 +469,6 @@ calcArea();
       y: event.clientY
     }
     
-    // lineEndPosition.x = event.clientX;
-    // lineEndPosition.y = event.clientY;
-
     setLineEndPosition(newEndPost)
   };
 
@@ -551,13 +493,11 @@ calcArea();
           })
         }
 
-        <p>Pole całkowite {calcArea()}</p>
+        <p>Pole całkowite {isIntersect ? 'Ściany nie mogą się przecinać!' : calcArea()} </p>
     
       </div>
     
     <div className="canvas">
-
-
       <canvas ref={canvasRef} width="1920" height="1080" onMouseMove={handleMouseMove} onClick={handleClick}></canvas>
     </div>
     
