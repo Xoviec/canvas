@@ -356,12 +356,18 @@ const calcArea = () => {
         setReadyPoly(true)
       }
     else{
+
+      // x: isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject) ?  event.clientX : linesHistory[linesHistory.length-1].x,
+      // y: isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject) ? linesHistory[linesHistory.length-1].y : event.clientY
+
+
+
       const newPos = {
-        x: event.clientX,
-        y: event.clientY
+        x: lineEndPosition.x,
+        y: lineEndPosition.y
       }
   
-      editLineHistroy(event.clientX, event.clientY)
+      editLineHistroy(newPos.x, newPos.y)
       setLineStartPosition(newPos)
     }
   
@@ -493,12 +499,27 @@ const calcArea = () => {
     console.log(isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject))
 
 
-    const newEndPost = {
-      x: isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject) ?  event.clientX : linesHistory[linesHistory.length-1].x,
-      y: isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject) ? linesHistory[linesHistory.length-1].y : event.clientY
+    if(!readyPoly){
+      const newEndPost = {
+        x: isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject) ?  event.clientX : linesHistory[linesHistory.length-1].x,
+        y: isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject) ? linesHistory[linesHistory.length-1].y : event.clientY
+      }
+
+    setLineEndPosition(newEndPost)
+
+    }
+    else{
+      const newEndPost = {
+        x: event.clientX,
+        y: event.clientY
+      }
+
+      setLineEndPosition(newEndPost)
+
     }
     
-    setLineEndPosition(newEndPost)
+
+    
   };
 
   return (
@@ -523,6 +544,7 @@ const calcArea = () => {
         }
 
         <p>Pole całkowite {isIntersect ? 'Ściany nie mogą się przecinać!' : calcArea()} </p>
+        <p>{lineEndPosition.x}, {lineEndPosition.y}</p>
     
       </div>
     
