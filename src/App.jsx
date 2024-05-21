@@ -63,10 +63,12 @@ function App() {
   
       if (o1 !== o2 && o3 !== o4) return true;
   
-      if (o1 === 0 && onSegment(p1, p2, q1)) return true;
-      if (o2 === 0 && onSegment(p1, q2, q1)) return true;
-      if (o3 === 0 && onSegment(p2, p1, q2)) return true;
-      if (o4 === 0 && onSegment(p2, q1, q2)) return true;
+
+      //ponizej tego działa git
+      // if (o1 === 0 && onSegment(p1, p2, q1)) return true;
+      // if (o2 === 0 && onSegment(p1, q2, q1)) return true;
+      // if (o3 === 0 && onSegment(p2, p1, q2)) return true;
+      // if (o4 === 0 && onSegment(p2, q1, q2)) return true;
   
       return false;
   }
@@ -168,16 +170,16 @@ const calcArea = () => {
           const x2 = linesHistory[i + 1].x;
           const y2 = linesHistory[i + 1].y;
           const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-          
+          const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
+          const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
+
+
+          const cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
+          ctx.beginPath();
+          ctx.arc(xMid, yMid, 10, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
           
           if (distance > 0) { // Sprawdzenie, czy odległość jest większa od zera
-            const xMid = (x1 + x2) / 2; // Współrzędna x środka odcinka
-            const yMid = (y1 + y2) / 2; // Współrzędna y środka odcinka
-  
-  
-            const cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
-            ctx.beginPath();
-            ctx.arc(xMid, yMid, 10, 0, Math.PI * 2); // Rysowanie kółka na środku odcinka
+
   
             ctx.fillStyle = cursorDistance<10 ? 'rgba(109, 109, 109, 1)' : 'rgba(67, 67, 67, 1)'
 
@@ -186,8 +188,19 @@ const calcArea = () => {
             ctx.fillStyle = 'white';
             ctx.font = '12px Arial';
             ctx.fillText(i, xMid - 4, yMid + 4); // Wyświetlanie numeru indeksu w kółku
-            ctx.closePath()
+
           }
+          else{
+            ctx.fillStyle = 'orange'
+            ctx.fill();
+
+            ctx.fillStyle = 'red';
+            ctx.font = '12px Arial';
+            ctx.fillText(i, xMid - 4, yMid + 4); // Wyświetlanie numeru indeksu w kółku
+
+
+          }
+          ctx.closePath()
         }
       });
 
@@ -300,8 +313,8 @@ const calcArea = () => {
     console.log(linesHistory)
     console.log('xd', linesHistory.slice(1))
 
-
-    drawLinesHistory()
+    //nw czy musi byc
+    // drawLinesHistory()
 
 
   },[linesHistory])
