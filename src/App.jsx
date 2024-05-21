@@ -40,6 +40,12 @@ function App() {
     )
 
 
+    function isHorizontalLine(point1, point2) {
+      const deltaX = Math.abs(point2.x - point1.x);
+      const deltaY = Math.abs(point2.y - point1.y);
+      return deltaX > deltaY;
+  }
+
 
     function onSegment(p, q, r) {
       if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) &&
@@ -272,8 +278,6 @@ const calcArea = () => {
     const ctx = canvas.getContext('2d');
 
     const drawLine = () => {
-
-
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if(!readyPoly){
@@ -284,9 +288,6 @@ const calcArea = () => {
         ctx.lineWidth = 5;
         ctx.stroke();
       }
-      
-
-
       // console.log('usuwam')
       drawLinesHistory()
 
@@ -304,20 +305,20 @@ const calcArea = () => {
     };
   }, [lineEndPosition, lineStartPosition]);
 
-  useEffect(()=>{
+  // useEffect(()=>{
 
-    console.log('rysuje')
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+  //   console.log('rysuje')
+  //   const canvas = canvasRef.current;
+  //   const ctx = canvas.getContext('2d');
 
-    console.log(linesHistory)
-    console.log('xd', linesHistory.slice(1))
+  //   console.log(linesHistory)
+  //   console.log('xd', linesHistory.slice(1))
 
-    //nw czy musi byc
-    // drawLinesHistory()
+  //   //nw czy musi byc
+  //   // drawLinesHistory()
 
 
-  },[linesHistory])
+  // },[linesHistory])
 
 
   const editLineHistroy = (x,y) =>{
@@ -387,11 +388,7 @@ const calcArea = () => {
             
             let cursorDistance = Math.sqrt(Math.pow(lineEndPosition.x - xMid, 2) + Math.pow(lineEndPosition.y - yMid, 2));
 
-            function isHorizontalLine(point1, point2) {
-              const deltaX = Math.abs(point2.x - point1.x);
-              const deltaY = Math.abs(point2.y - point1.y);
-              return deltaX > deltaY;
-          }
+
 
           
 
@@ -476,10 +473,29 @@ const calcArea = () => {
 
   const handleMouseMove = (event) => {
 
+    console.log(lineEndPosition)
 
-    const newEndPost = {
+    console.log(Math.abs(linesHistory[linesHistory.length-1].x-event.clientX))
+    console.log(Math.abs(linesHistory[linesHistory.length-1].y-event.clientY))
+
+
+    const eventToObject = {
       x: event.clientX,
       y: event.clientY
+    }
+
+    // const horizontalLength = Math.abs(linesHistory[linesHistory.length-1].x-event.clientX)
+
+    // const verticalLength = Math.abs(linesHistory[linesHistory.length-1].y-event.clientY)
+
+    // console.log(horizontalLength>verticalLength ? 'poziomo' : 'pionowo')
+
+    console.log(isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject))
+
+
+    const newEndPost = {
+      x: isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject) ?  event.clientX : linesHistory[linesHistory.length-1].x,
+      y: isHorizontalLine(linesHistory[linesHistory.length-1], eventToObject) ? linesHistory[linesHistory.length-1].y : event.clientY
     }
     
     setLineEndPosition(newEndPost)
