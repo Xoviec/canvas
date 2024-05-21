@@ -324,15 +324,31 @@ const calcArea = () => {
   const editLineHistroy = (x,y) =>{
 
 
+
     const newLine = {
       x: x,
       y: y
     }
+    
+
+
     console.log(newLine)
 
 
     console.log([...linesHistory, newLine])
     setLinesHistory([...linesHistory, newLine])
+
+    if(linesHistory.length>1){
+      if(isHorizontalLine(linesHistory[linesHistory.length-2], linesHistory[linesHistory.length-1]) === isHorizontalLine(linesHistory[linesHistory.length-1], newLine)){
+        console.log("ten sam kierunek ojć")
+        let prevLines = [...linesHistory]
+        prevLines[prevLines.length-1] = newLine
+        setLinesHistory(prevLines)
+      }
+      else{
+        console.log('inny kieerunek')
+      }
+    }
 
   }
 
