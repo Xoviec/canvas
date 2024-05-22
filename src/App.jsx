@@ -323,18 +323,11 @@ const calcArea = () => {
 
   const editLineHistroy = (x,y) =>{
 
-
-
     const newLine = {
       x: x,
       y: y
-    }
+    }    
     
-
-
-    console.log(newLine)
-
-
     console.log([...linesHistory, newLine])
     setLinesHistory([...linesHistory, newLine])
 
@@ -359,15 +352,33 @@ const calcArea = () => {
 
       const cursorDistanceFromStart = Math.sqrt(Math.pow(linesHistory[0].x - event.clientX, 2) + Math.pow(linesHistory[0].y - event.clientY, 2));
 
-  
       if(cursorDistanceFromStart<20){
         const newPos = {
           x: linesHistory[0].x,
           y: linesHistory[0].y,
         }
+
+        let newPrevPos = [...linesHistory]
     
-        editLineHistroy(linesHistory[0].x, linesHistory[0].y)
-    
+        if(isHorizontalLine(linesHistory[linesHistory.length-2], linesHistory[linesHistory.length-1]) ){
+
+          newPrevPos[newPrevPos.length-1] = {
+            x: linesHistory[0].x,
+            y: newPrevPos[newPrevPos.length-1].y
+          }
+          
+        }
+        else{
+          newPrevPos[newPrevPos.length-1] = {
+            x: newPrevPos[newPrevPos.length-1].x,
+            y: linesHistory[0].y,
+          }
+        }
+        
+        newPrevPos = [...newPrevPos, newPos]
+
+
+        setLinesHistory(newPrevPos)
         setLineEndPosition(newPos)
         setReadyPoly(true)
       }
@@ -382,6 +393,8 @@ const calcArea = () => {
         x: lineEndPosition.x,
         y: lineEndPosition.y
       }
+
+
   
       editLineHistroy(newPos.x, newPos.y)
       setLineStartPosition(newPos)
